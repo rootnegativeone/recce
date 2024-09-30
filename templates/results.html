@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+    <title>Analysis Results</title>
+</head>
+<body>
+    <h1>Results</h1>
+    <p><a href="/{{ sitemap_link }}">Download Sitemap</a></p>
+    <h2>Screenshots:</h2>
+    <ul>
+        {% for screenshot in screenshots %}
+        <li><a href="/static/{{ screenshot }}">{{ screenshot }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
