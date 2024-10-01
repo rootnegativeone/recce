@@ -1,0 +1,12 @@
+static/results/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.env/
+.DS_Store
+node_modules/
+dev/
+exp/
+tests/
+
