@@ -3,10 +3,12 @@ import os
 import uuid
 import json
 import requests
+import boto3
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
 app = Flask(__name__)
+s3 = boto3.client('s3', region_name='ca-central-1')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -20,14 +22,25 @@ def index():
 
 @app.route('/results/<task_id>')
 def results(task_id):
-    sitemap_link = f'static/results/{task_id}/sitemap.json'
+    sitemap_file = f'static/results/{task_id}/sitemap.json'
     screenshots_dir = f'static/results/{task_id}/screenshots'
-    screenshots = [
-        f'results/{task_id}/screenshots/{f}'
-        for f in os.listdir(screenshots_dir)
-        if f.endswith('.png')
-    ]
-    return render_template('results.html', sitemap_link=sitemap_link, screenshots=screenshots)
+
+    # Upload sitemap to S3
+    sitemap_object_name = f'{task_id}/sitemap.json'
+    upload_file_to_s3(sitemap_file, 'recce-results', sitemap_object_name)
+    sitemap_url = generate_presigned_url('recce-results', sitemap_object_name, expiration=86400)  # 24 hours
+
+    # Upload screenshots to S3 and generate URLs
+    screenshot_urls = []
+    for filename in os.listdir(screenshots_dir):
+        if filename.endswith('.png'):
+            file_path = os.path.join(screenshots_dir, filename)
+            object_name = f'{task_id}/screenshots/{filename}'
+            upload_file_to_s3(file_path, 'recce-results', object_name)
+            url = generate_presigned_url('recce-results', object_name, expiration=86400)
+            screenshot_urls.append(url)
+
+    return render_template('results.html', sitemap_url=sitemap_url, screenshot_urls=screenshot_urls)
 
 def generate_sitemap(start_url, task_id):
     visited = set()
@@ -95,6 +108,15 @@ def capture_screenshots(sitemap_file, task_id):
                 print(f"Failed to capture screenshot for {url}: {e}")
                 continue
         browser.close()
+
+def upload_file_to_s3(file_path, bucket_name, object_name):
+    s3.upload_file(file_path, bucket_name, object_name)
+
+def generate_presigned_url(bucket_name, object_name, expiration=3600):
+    response = s3.generate_presigned_url('get_object',
+                                         Params={'Bucket': bucket_name, 'Key': object_name},
+                                         ExpiresIn=expiration)
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

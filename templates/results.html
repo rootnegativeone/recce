@@ -5,11 +5,11 @@
 </head>
 <body>
     <h1>Results</h1>
-    <p><a href="/{{ sitemap_link }}">Download Sitemap</a></p>
-    <h2>Screenshots:</h2>
+    <p><a href="{{ sitemap_url }}">Download Sitemap (expires in 24 hours)</a></p>
+    <h2>Screenshots (links expire in 24 hours):</h2>
     <ul>
-        {% for screenshot in screenshots %}
-        <li><a href="/static/{{ screenshot }}">{{ screenshot }}</a></li>
+        {% for url in screenshot_urls %}
+        <li><a href="{{ url }}">View Screenshot {{ loop.index }}</a></li>
         {% endfor %}
     </ul>
 </body>
