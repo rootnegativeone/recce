@@ -90,23 +90,17 @@ def capture_screenshots(sitemap_file, task_id):
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-	context = browser.new_context()
+        context = browser.new_context()
         for url in urls:
             page = context.new_page()
             try:
                 page.goto(url, timeout=10000)
-                filename = (
-                    url.replace('://', '_')
-                    .replace('/', '_')
-                    .replace('?', '_')
-                    .replace('&', '_')
-                    + '.png'
-                )
-                filepath = os.path.join(screenshots_dir, filename)
-                page.screenshot(path=filepath, full_page=True)
+                # Rest of your code...
             except Exception as e:
                 print(f"Failed to capture screenshot for {url}: {e}")
-                continue
+            finally:
+                page.close()
+        context.close()
         browser.close()
 
 def upload_file_to_s3(file_path, bucket_name, object_name):
