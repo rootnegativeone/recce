@@ -89,8 +89,8 @@ def capture_screenshots(sitemap_file, task_id):
     os.makedirs(screenshots_dir, exist_ok=True)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch()
-        context = browser.new_context()
+        browser = p.chromium.launch(headless=True)
+	context = browser.new_context()
         for url in urls:
             page = context.new_page()
             try:
