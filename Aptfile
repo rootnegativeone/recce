@@ -15,9 +15,9 @@ libgtk-3-0
 libgdk-pixbuf2.0-0
 libwoff1
 libopus0
-libwebp6
+libwebp7        # Updated from libwebp6 to libwebp7
 libwebpdemux2
-libenchant1c2a
+libenchant-2-2  # Updated from libenchant1c2a to libenchant-2-2
 libsecret-1-0
 libhyphen0
 libgstreamer1.0-0
