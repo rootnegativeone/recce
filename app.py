@@ -14,17 +14,18 @@ s3 = boto3.client('s3', region_name='ca-central-1')
 # Set up logging (optional but recommended)
 logging.basicConfig(level=logging.ERROR)
 
+def generate_task_id():
+    return str(uuid.uuid4())
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         try:
-            # Your existing code to process the form
             url = request.form['url']
             task_id = generate_task_id()
-            sitemap_file = f'sitemaps/{task_id}.json'
             # Call your functions
-            generate_sitemap(url, sitemap_file)
-            capture_screenshots(sitemap_file, task_id)
+            sitemap_file = generate_sitemap(url, task_id)
+            capture_screenshots(task_id)
             # Redirect or render success template
             return redirect(url_for('results', task_id=task_id))
         except Exception as e:
@@ -118,13 +119,14 @@ def generate_sitemap(start_url, task_id):
     with open(sitemap_file, 'w') as f:
         json.dump(sitemap, f)
 
-    return sitemap_file
+    return sitemap_file  # Return the sitemap_file path
 
-def capture_screenshots(sitemap_file, task_id):
+def capture_screenshots(task_id):
+    result_dir = f'static/results/{task_id}'
+    sitemap_file = f'{result_dir}/sitemap.json'
     with open(sitemap_file, 'r') as f:
         urls = json.load(f)
 
-    result_dir = f'static/results/{task_id}'
     screenshots_dir = f'{result_dir}/screenshots'
     os.makedirs(screenshots_dir, exist_ok=True)
 
@@ -135,9 +137,9 @@ def capture_screenshots(sitemap_file, task_id):
             page = context.new_page()
             try:
                 page.goto(url, timeout=10000)
-                # Capture the screenshot
                 screenshot_path = os.path.join(screenshots_dir, f'screenshot_{idx + 1}.png')
                 page.screenshot(path=screenshot_path, full_page=True)
+                print(f"Captured screenshot for {url}")
             except Exception as e:
                 print(f"Failed to capture screenshot for {url}: {e}")
             finally:
