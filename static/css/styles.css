@@ -1,8 +1,41 @@
+body, html {
+    font-family: 'Roboto', sans-serif;
+    background-color: #000;
+    color: #fff;
+}
+
 .container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh; /* Optional: to center vertically */
+    height: 100vh;
 }
 
+h1, h2, p, a {
+    color: #fff;
+}
+
+button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+.error-container {
+    background-color: #333;
+    border: 1px solid #666;
+    color: #fff;
+}
+
+.error-message {
+    background-color: #444;
+    border: 1px solid #666;
+    color: #ff7373;
+}

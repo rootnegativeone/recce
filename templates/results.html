@@ -2,17 +2,28 @@
 <html>
 <head>
     <title>Analysis Results</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Results</h1>
-    <p><a href="{{ sitemap_url }}">Download Sitemap (expires in 24 hours)</a></p>
-    <h2>Screenshots (expire in 24 hours):</h2>
-    {% for url in screenshot_urls %}
-        <div>
-            <h3>Screenshot {{ loop.index }}</h3>
-            <img src="{{ url }}" alt="Screenshot {{ loop.index }}" style="max-width: 100%; height: auto;">
+    <div class="container">
+        <h1>Results</h1>
+        <p><a href="{{ sitemap_url }}" style="color: #4CAF50;">Download Sitemap (expires in 24 hours)</a></p>
+        <h2>Sitemap Tree:</h2>
+        <ul id="sitemap">
+            {% for url in sitemap %}
+                <li>{{ url }}</li>
+            {% endfor %}
+        </ul>
+        <h2>Screenshots (expire in 24 hours):</h2>
+        <div class="screenshot-previews">
+            {% for url, filename in screenshot_urls %}
+                <div class="screenshot-item">
+                    <h3>Screenshot {{ loop.index }} - <a href="{{ url }}" style="color: #4CAF50;">{{ filename }}</a></h3>
+                    <img src="{{ url }}" alt="Screenshot {{ loop.index }}" style="max-width: 200px; height: auto;">
+                </div>
+            {% endfor %}
         </div>
-    {% endfor %}
+    </div>
 </body>
 </html>
-
