@@ -6,6 +6,7 @@ import requests
 import boto3
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
+import logging
 
 app = Flask(__name__)
 s3 = boto3.client('s3', region_name='ca-central-1')
