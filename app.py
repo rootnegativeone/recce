@@ -10,15 +10,54 @@ from playwright.sync_api import sync_playwright
 app = Flask(__name__)
 s3 = boto3.client('s3', region_name='ca-central-1')
 
+# Set up logging (optional but recommended)
+logging.basicConfig(level=logging.ERROR)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        url = request.form['url']
-        task_id = str(uuid.uuid4())
-        sitemap_file = generate_sitemap(url, task_id)
-        capture_screenshots(sitemap_file, task_id)
-        return redirect(url_for('results', task_id=task_id))
+        try:
+            # Your existing code to process the form
+            url = request.form['url']
+            task_id = generate_task_id()
+            sitemap_file = f'sitemaps/{task_id}.json'
+            # Call your functions
+            generate_sitemap(url, sitemap_file)
+            capture_screenshots(sitemap_file, task_id)
+            # Redirect or render success template
+            return redirect(url_for('results', task_id=task_id))
+        except Exception as e:
+            app.logger.error(f"Error processing request: {e}")
+            return render_template('error.html', error_message=str(e)), 500
     return render_template('index.html')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html', error_message='Page not found.'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    app.logger.error(f"Server Error: {e}, Path: {request.path}")
+    return render_template('error.html', error_message='An internal server error occurred.'), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Pass through HTTP errors
+    if isinstance(e, HTTPException):
+        return e
+
+    # Log the error
+    app.logger.error(f"Unhandled Exception: {e}")
+
+    # Show detailed error only in development
+    if app.config.get("ENV") == "development":
+        return render_template('error.html', error_message=str(e)), 500
+    else:
+        return render_template('error.html', error_message='An internal error occurred.'), 500
+
+@app.route('/trigger-error')
+def trigger_error():
+    raise Exception('This is a test error!')
 
 @app.route('/results/<task_id>')
 def results(task_id):
@@ -113,5 +152,5 @@ def generate_presigned_url(bucket_name, object_name, expiration=3600):
     return response
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5001)))
 

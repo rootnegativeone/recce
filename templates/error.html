@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 40px;
+        }
+        .error-container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        h1 {
+            color: #d9534f;
+        }
+        p {
+            color: #333;
+        }
+        .error-message {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9e2e2;
+            border: 1px solid #e0b4b4;
+            border-radius: 4px;
+            color: #a94442;
+            word-wrap: break-word;
+        }
+        a {
+            color: #337ab7;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>Oops! An error occurred.</h1>
+        <p>We're sorry, but something went wrong while processing your request.</p>
+        {% if error_message %}
+            <div class="error-message">
+                <strong>Error Details:</strong> {{ error_message }}
+            </div>
+        {% endif %}
+        <p><a href="{{ url_for('index') }}">Return to Home Page</a></p>
+    </div>
+</body>
+</html>
+
