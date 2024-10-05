@@ -130,11 +130,13 @@ def capture_screenshots(sitemap_file, task_id):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         context = browser.new_context()
-        for url in urls:
+        for idx, url in enumerate(urls):
             page = context.new_page()
             try:
                 page.goto(url, timeout=10000)
-                # Rest of your code...
+                # Capture the screenshot
+                screenshot_path = os.path.join(screenshots_dir, f'screenshot_{idx + 1}.png')
+                page.screenshot(path=screenshot_path, full_page=True)
             except Exception as e:
                 print(f"Failed to capture screenshot for {url}: {e}")
             finally:

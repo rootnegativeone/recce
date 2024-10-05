@@ -6,12 +6,13 @@
 <body>
     <h1>Results</h1>
     <p><a href="{{ sitemap_url }}">Download Sitemap (expires in 24 hours)</a></p>
-    <h2>Screenshots (links expire in 24 hours):</h2>
-    <ul>
-        {% for url in screenshot_urls %}
-        <li><a href="{{ url }}">View Screenshot {{ loop.index }}</a></li>
-        {% endfor %}
-    </ul>
+    <h2>Screenshots (expire in 24 hours):</h2>
+    {% for url in screenshot_urls %}
+        <div>
+            <h3>Screenshot {{ loop.index }}</h3>
+            <img src="{{ url }}" alt="Screenshot {{ loop.index }}" style="max-width: 100%; height: auto;">
+        </div>
+    {% endfor %}
 </body>
 </html>
 
