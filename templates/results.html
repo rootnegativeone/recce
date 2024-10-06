@@ -9,21 +9,26 @@
     <div class="container">
         <h1>Results</h1>
         <p><a href="{{ sitemap_url }}" style="color: #4CAF50;">Download Sitemap (expires in 24 hours)</a></p>
+
         <h2>Sitemap Tree:</h2>
         <ul id="sitemap">
-            {% for url in sitemap %}
-                <li>{{ url }}</li>
+            {% for node in sitemap_tree %}
+                <li>{{ node }}</li>
             {% endfor %}
         </ul>
+
         <h2>Screenshots (expire in 24 hours):</h2>
-        <div class="screenshot-previews">
-            {% for url, filename in screenshot_urls %}
-                <div class="screenshot-item">
-                    <h3>Screenshot {{ loop.index }} - <a href="{{ url }}" style="color: #4CAF50;">{{ filename }}</a></h3>
-                    <img src="{{ url }}" alt="Screenshot {{ loop.index }}" style="max-width: 200px; height: auto;">
-                </div>
-            {% endfor %}
+        <div class="screenshot-grid">
+ 
+             {% for url in screenshot_urls %}
+                 <div class="screenshot-item">
+                     <img src="{{ url }}" alt="Screenshot {{ loop.index }}">
+                     <h3>Screenshot {{ loop.index }}</h3>
+                 </div>
+             {% endfor %}
+       
         </div>
     </div>
 </body>
 </html>
+

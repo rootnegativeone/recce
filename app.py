@@ -6,7 +6,10 @@ import requests
 import boto3
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
+from werkzeug.exceptions import HTTPException
 import logging
+from anytree import Node, RenderTree
+from urllib.parse import urlparse
 
 app = Flask(__name__)
 s3 = boto3.client('s3', region_name='ca-central-1')
@@ -71,17 +74,28 @@ def results(task_id):
     upload_file_to_s3(sitemap_file, 'recce-results', sitemap_object_name)
     sitemap_url = generate_presigned_url('recce-results', sitemap_object_name, expiration=86400)  # 24 hours
 
-    # Upload screenshots to S3 and generate URLs
-    screenshot_urls = []
-    for filename in os.listdir(screenshots_dir):
-        if filename.endswith('.png'):
-            file_path = os.path.join(screenshots_dir, filename)
-            object_name = f'{task_id}/screenshots/{filename}'
-            upload_file_to_s3(file_path, 'recce-results', object_name)
-            url = generate_presigned_url('recce-results', object_name, expiration=86400)
-            screenshot_urls.append(url)
+    # Load sitemap URLs for display
+    with open(sitemap_file, 'r') as f:
+        sitemap_urls = json.load(f)
 
-    return render_template('results.html', sitemap_url=sitemap_url, screenshot_urls=screenshot_urls)
+    sitemap_tree = build_sitemap_tree(sitemap_urls)
+
+    # Upload screenshots to S3 and generate URLs
+    # Sort filenames numerically to match the order
+    filenames = sorted(
+        [f for f in os.listdir(screenshots_dir) if f.endswith('.png')],
+        key=lambda x: int(x.split('_')[1].split('.')[0])
+    )
+
+    screenshot_urls = []
+    for filename in filenames:
+        file_path = os.path.join(screenshots_dir, filename)
+        object_name = f'{task_id}/screenshots/{filename}'
+        upload_file_to_s3(file_path, 'recce-results', object_name)
+        url = generate_presigned_url('recce-results', object_name, expiration=86400)
+        screenshot_urls.append(url)
+
+    return render_template('results.html', sitemap_url=sitemap_url, screenshot_urls=screenshot_urls, sitemap_tree=sitemap_tree)
 
 def generate_sitemap(start_url, task_id):
     visited = set()
@@ -121,6 +135,32 @@ def generate_sitemap(start_url, task_id):
 
     return sitemap_file  # Return the sitemap_file path
 
+def build_sitemap_tree(urls):
+    nodes = {}
+    root = None
+
+    for url in urls:
+        parsed = urlparse(url)
+        path_parts = parsed.path.strip('/').split('/')
+        current_path = ''
+        parent = None
+
+        for part in path_parts:
+            current_path = f"{current_path}/{part}" if current_path else f"/{part}"
+            if current_path not in nodes:
+                nodes[current_path] = Node(part or 'root', parent=parent)
+            parent = nodes[current_path]
+
+        if root is None:
+            root = nodes['/']  # The root node
+
+    # Render the tree into a list of strings
+    sitemap_tree = []
+    for pre, fill, node in RenderTree(root):
+        sitemap_tree.append(f"{pre}{node.name}")
+
+    return sitemap_tree
+
 def capture_screenshots(task_id):
     result_dir = f'static/results/{task_id}'
     sitemap_file = f'{result_dir}/sitemap.json'
@@ -156,6 +196,6 @@ def generate_presigned_url(bucket_name, object_name, expiration=3600):
                                          ExpiresIn=expiration)
     return response
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5001)))
+#if __name__ == '__main__':
+#    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5001)))
 
