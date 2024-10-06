@@ -39,3 +39,8 @@ button:hover {
     border: 1px solid #666;
     color: #ff7373;
 }
+
+.screenshot-grid {
+    max-height: 80vh;
+    overflow-y: auto;
+}
