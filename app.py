@@ -93,10 +93,11 @@ def results(task_id):
         object_name = f'{task_id}/screenshots/{filename}'
         upload_file_to_s3(file_path, 'recce-results', object_name)
         url = generate_presigned_url('recce-results', object_name, expiration=86400)
-        screenshot_urls.append(url)
+        screenshot_urls.append({'url': url, 'filename': filename})
 
+    print(f"screenshot_urls: {screenshot_urls}")
     return render_template('results.html', sitemap_url=sitemap_url, screenshot_urls=screenshot_urls, sitemap_tree=sitemap_tree)
-
+ 
 def generate_sitemap(start_url, task_id):
     visited = set()
     to_visit = [start_url]
@@ -137,22 +138,18 @@ def generate_sitemap(start_url, task_id):
 
 def build_sitemap_tree(urls):
     nodes = {}
-    root = None
+    root = Node('root')
+    nodes['/'] = root
 
     for url in urls:
         parsed = urlparse(url)
-        path_parts = parsed.path.strip('/').split('/')
-        current_path = ''
-        parent = None
+        path_parts = [part for part in parsed.path.strip('/').split('/') if part]
+        current_parent = root
 
         for part in path_parts:
-            current_path = f"{current_path}/{part}" if current_path else f"/{part}"
-            if current_path not in nodes:
-                nodes[current_path] = Node(part or 'root', parent=parent)
-            parent = nodes[current_path]
-
-        if root is None:
-            root = nodes['/']  # The root node
+            if part not in nodes:
+                nodes[part] = Node(part, parent=current_parent)
+            current_parent = nodes[part]
 
     # Render the tree into a list of strings
     sitemap_tree = []
@@ -173,17 +170,17 @@ def capture_screenshots(task_id):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         context = browser.new_context()
+        page = context.new_page()  # Create a single page instance
         for idx, url in enumerate(urls):
-            page = context.new_page()
             try:
-                page.goto(url, timeout=10000)
+                page.goto(url, timeout=30000)  # Increase timeout if needed
                 screenshot_path = os.path.join(screenshots_dir, f'screenshot_{idx + 1}.png')
                 page.screenshot(path=screenshot_path, full_page=True)
                 print(f"Captured screenshot for {url}")
             except Exception as e:
                 print(f"Failed to capture screenshot for {url}: {e}")
-            finally:
-                page.close()
+            # No need to close the page; reuse it
+        page.close()
         context.close()
         browser.close()
 
