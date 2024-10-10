@@ -106,7 +106,7 @@ def generate_sitemap(start_url, task_id):
 
     while to_visit:
         url = to_visit.pop()
-        if url in visited or len(visited) >= 50:  # Limit to 50 pages
+        if url in visited or len(visited) >= 10:  # Limit to 10 pages
             continue
         visited.add(url)
         sitemap.append(url)
@@ -193,6 +193,6 @@ def generate_presigned_url(bucket_name, object_name, expiration=3600):
                                          ExpiresIn=expiration)
     return response
 
-#if __name__ == '__main__':
-#    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5001)))
-
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port)

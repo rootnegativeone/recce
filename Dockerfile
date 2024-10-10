@@ -17,5 +17,4 @@ COPY . /app/
 EXPOSE 5001
 
 # Command to run on container start
-CMD ["gunicorn", "--bind", "0.0.0.0:5001", "app:app"]
-
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "--timeout", "120", "app:app"]
