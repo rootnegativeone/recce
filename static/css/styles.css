@@ -1,99 +1,68 @@
+/* General Styles */
 body, html {
     font-family: 'Roboto', sans-serif;
     background-color: #000;
     color: #fff;
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Add height for centering */
 }
 
-.container {
+body {
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    /* Remove height: 100vh; to allow scrolling */
+    align-items: center;
+}
+
+/* Augmented UI Customization */
+.augmented-ui {
+    --aug-border: 2px solid rgba(0, 183, 255, 1); /* Corrected variable name */
+    --aug-border-bg: transparent; /* Corrected variable name */
+    --aug-border-shadow: 0 0 20px rgba(0, 183, 255, 1); /* Corrected variable name */
+    background: transparent;
+    display: inline-block;
     padding: 20px;
+    overflow: visible;
 }
 
-h1, h2, p, a {
+/* Typography */
+h1, h2, h3, p, a {
     color: #fff;
+    text-align: center;
 }
 
+/* Button Styles */
 button {
     background-color: #333;
     color: #fff;
     border: none;
     padding: 10px 20px;
     cursor: pointer;
+    width: 100%;
 }
 
 button:hover {
     background-color: #555;
 }
 
-.error-container {
-    background-color: #333;
-    border: 1px solid #666;
+/* Input Styles */
+input[type="url"] {
+    background-color: #222;
     color: #fff;
-}
-
-.error-message {
-    background-color: #444;
-    border: 1px solid #666;
-    color: #ff7373;
-}
-
-/* Grid styles */
-.screenshot-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    padding: 20px;
-}
-
-.screenshot-item {
-    flex: 1 1 calc(33% - 40px);
-    box-sizing: border-box;
-    max-width: calc(33% - 40px);
-    margin: 10px;
-    text-align: center;
-}
-
-.screenshot-item img {
+    border: 1px solid #555;
+    padding: 10px;
     width: 100%;
-    height: auto;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
 }
 
-.screenshot-item h3, .screenshot-item p {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #fff;
+input[type="url"]::placeholder {
+    color: #777;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .screenshot-item {
-        flex: 1 1 calc(50% - 40px);
-        max-width: calc(50% - 40px);
-    }
-}
-
-@media (max-width: 480px) {
-    .screenshot-item {
-        flex: 1 1 100%;
-        max-width: 100%;
-    }
-}
-
-/* Sitemap styles */
-#sitemap {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-#sitemap li {
-    margin: 5px 0;
-    color: #fff;
+/* Form Container */
+form {
+    max-width: 400px;
+    margin: 0 auto;
 }
 

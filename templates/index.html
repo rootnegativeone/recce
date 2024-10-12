@@ -4,15 +4,18 @@
     <title>Recce</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/augmented-ui/augmented-ui.min.css">
 </head>
 <body>
-   <div class="container"> 
-        <h1>Recce</h1>
-        <h2>Enter Website URL</h2>
-        <form method="post">
-            <input type="url" name="url" placeholder="https://example.com" required>
-            <button type="submit">Analyze</button>
-        </form>
+    <div class="augmented-ui" data-augmented-ui="tl-clip tr-clip bl-clip br-clip border">
+        <div class="container"> 
+            <h1>Recce</h1>
+            <h3>Enter Website URL</h3>
+            <form method="post">
+                <input type="url" name="url" placeholder="https://example.com" required>
+                <button type="submit">Generate Sitemap and Screenshot</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
