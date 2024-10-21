@@ -1,3 +1,4 @@
 release: python -m playwright install
-web: gunicorn app:app
+web: gunicorn app:app 
+
 

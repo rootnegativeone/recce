@@ -1,22 +1,64 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Recce</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/augmented-ui/augmented-ui.min.css">
+    <meta charset="UTF-8">
+    <title>Recce - Website Analyzer</title>
+    <!-- Link to the CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Include the Roboto font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
 </head>
 <body>
-    <div class="augmented-ui" data-augmented-ui="tl-clip tr-clip bl-clip br-clip border">
-        <div class="container"> 
-            <h1>Recce</h1>
-            <h3>Enter Website URL</h3>
-            <form method="post">
-                <input type="url" name="url" placeholder="https://example.com" required>
-                <button type="submit">Generate Sitemap and Screenshot</button>
-            </form>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">Recce Control Panel</div>
+        <div class="status">
+            <svg width="10" height="10">
+                <circle cx="5" cy="5" r="5" fill="#28a745"></circle>
+            </svg>
+            {% if analysis_complete %}
+                Analysis Complete
+            {% else %}
+                Ready
+            {% endif %}
         </div>
-    </div>
+    </header>
+
+    <!-- MAIN INPUT AREA -->
+    <section class="input-section">
+        <h2>Enter Website URL</h2>
+        <form action="/" method="post">
+            <input type="url" name="url" placeholder="https://example.com" required>
+            <button type="submit" class="btn-generate">Analyze</button>
+        </form>
+    </section>
+
+    {% if analysis_complete %}
+    <!-- RESULT PANELS -->
+    <section class="results-section">
+        <div class="sitemap-panel">
+            <h3>Sitemap</h3>
+            <div class="sitemap-box">
+                <pre>{{ sitemap_tree|join('\n') }}</pre>
+            </div>
+        </div>
+
+        <div class="screenshot-panel">
+            <h3>Screenshots</h3>
+            <div class="screenshot-grid">
+                {% for screenshot in screenshot_urls %}
+                    <div class="screenshot-item">
+                        <img src="{{ screenshot.url }}" alt="{{ screenshot.filename }}">
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; {{ current_year }} Outis Enterprises Incorporated. All rights reserved.</p>
+    </footer>
 </body>
 </html>
-
