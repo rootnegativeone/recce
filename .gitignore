@@ -9,4 +9,5 @@ node_modules/
 dev/
 exp/
 tests/
+.env.local
 .local
