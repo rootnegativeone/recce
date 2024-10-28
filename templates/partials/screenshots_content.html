@@ -1,0 +1,9 @@
+<div class="screenshot-grid">
+    {% for screenshot in screenshot_urls %}
+        <div class="screenshot-item">
+            <a href="{{ screenshot.url }}" class="page-title" target="_blank">{{ screenshot.filename }}</a>
+            <img src="{{ screenshot.url }}" alt="{{ screenshot.filename }}">
+        </div>
+    {% endfor %}
+</div>
+

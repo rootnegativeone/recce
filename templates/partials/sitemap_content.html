@@ -1,0 +1,6 @@
+{% if sitemap_tree %}
+    <pre>{{ sitemap_tree|join('\n')|safe }}</pre>
+{% else %}
+    <pre>No sitemap available.</pre>
+{% endif %}
+

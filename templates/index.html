@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Recce - Website Analyzer</title>
+    <title>RECCE</title>
     <!-- Link to the CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <!-- Include the Roboto font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <!-- Include the Orbitron font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap">
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 </head>
 <body>
     <!-- HEADER -->
     <header class="header">
-        <div class="logo">Recce Control Panel</div>
+        <div class="logo">RECCE | SITE ANALYSIS</div>
         <div class="status">
             <svg width="10" height="10">
                 <circle cx="5" cy="5" r="5" fill="#28a745"></circle>
@@ -24,37 +25,70 @@
         </div>
     </header>
 
-    <!-- MAIN INPUT AREA -->
-    <section class="input-section">
-        <h2>Enter Website URL</h2>
-        <form action="/" method="post">
-            <input type="url" name="url" placeholder="https://example.com" required>
-            <button type="submit" class="btn-generate">Analyze</button>
-        </form>
-    </section>
+    <!-- MAIN CONTROL ROW -->
+    <div class="control-row">
+        <!-- URL INPUT AREA -->
+        <section class="input-section">
+            <h3>ENTER URL</h3>
+            <form action="/" method="post">
+                <input type="url" name="url" placeholder="https://example.com" required>
+                <button type="submit" class="btn-generate">GENERATE</button>
+            </form>
+        </section>
 
-    {% if analysis_complete %}
+        <!-- ADMIN SECTION -->
+        <section class="admin-section">
+            <h3>Admin</h3>
+            <div class="admin-controls">
+                <button class="btn-admin" disabled>Subscription</button>
+                <button class="btn-admin" disabled>Account</button>
+            </div>
+        </section>
+    </div>
+
     <!-- RESULT PANELS -->
-    <section class="results-section">
-        <div class="sitemap-panel">
-            <h3>Sitemap</h3>
-            <div class="sitemap-box">
-                <pre>{{ sitemap_tree|join('\n') }}</pre>
-            </div>
-        </div>
-
-        <div class="screenshot-panel">
-            <h3>Screenshots</h3>
-            <div class="screenshot-grid">
-                {% for screenshot in screenshot_urls %}
-                    <div class="screenshot-item">
-                        <img src="{{ screenshot.url }}" alt="{{ screenshot.filename }}">
+	<section class="results-section">
+	    <div class="results-container">
+		<!-- TOP PANELS: Sitemap and API Analysis -->
+		<div class="top-panels">
+		    <div class="sitemap-panel" id="sitemap-panel">
+			<h3>SITEMAP</h3>
+                        <div class="sitemap-box" id="sitemap-content">
+                            {% if sitemap_tree %}
+                                <pre>{{ sitemap_tree|join('\n')|safe }}</pre>
+                            {% else %}
+                                <pre>Enter a URL above to analyze sitemap...</pre>
+                            {% endif %}
+                        </div>
                     </div>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    {% endif %}
+                    <div class="api-panel">
+			<h3>API CALLS</h3>
+			<div class="api-box">
+			    {% for call in session.get('api_calls', []) %}
+				<pre>{{ call.method }} {{ call.url }}</pre>
+			    {% else %}
+				<pre>Enter a URL above to analyze APIs...</pre>
+			    {% endfor %}
+			</div>
+		    </div>
+		</div>
+
+		<!-- BOTTOM PANEL: Screenshots -->
+               <div class="screenshot-panel" id="screenshot-panel">
+                    <h3>SCREENSHOTS</h3>
+                    <div class="screenshot-grid" id="screenshots-content">
+                        <!-- Initial content or placeholders -->
+                            {% for i in range(4) %}
+                                <div class="screenshot-item placeholder">
+                                    <div class="placeholder-content">
+                                        <span> Preview will appear here</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                    </div>
+                </div>
+	    </div>
+	</section>
 
     <!-- FOOTER -->
     <footer>
@@ -62,3 +96,24 @@
     </footer>
 </body>
 </html>
+
+<script>
+    function checkTaskStatus() {
+        fetch('/task_status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'sitemap_complete' || data.status === 'capturing_screenshots' || data.status === 'complete') {
+                    // Update the sitemap section
+                    htmx.ajax('GET', '/sitemap_content', '#sitemap-content');
+                }
+                if (data.status === 'capturing_screenshots' || data.status === 'complete') {
+                    // Update the screenshots section
+                    htmx.ajax('GET', '/screenshots_content', '#screenshots-content');
+                }
+            });
+    }
+
+    // Start polling every 5 seconds
+    setInterval(checkTaskStatus, 5000);
+</script>
+
