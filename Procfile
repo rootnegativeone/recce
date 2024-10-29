@@ -1,3 +1,2 @@
-web: gunicorn app:app 
-release: python -m playwright install
+web: gunicorn app:app --timeout 120
 

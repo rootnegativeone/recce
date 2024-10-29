@@ -18,6 +18,9 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Required for session handling
 s3 = boto3.client('s3', region_name='ca-central-1')  
 
+# Install browsers
+os.system("playwright install chromium")
+
 def upload_file_to_s3(file_path, bucket_name, object_name):
     try:
         s3.upload_file(file_path, bucket_name, object_name)
@@ -159,13 +162,22 @@ def capture_screenshots(task_id, urls):
     processed_urls = set()
     screenshot_urls = []
     tasks[task_id]['api_calls'] = []
+    
+    # Create directories if they don't exist
+    result_dir = f'static/results/{task_id}'
+    screenshots_dir = f'{result_dir}/screenshots'
+    os.makedirs(screenshots_dir, exist_ok=True)
 
     result_dir = f'static/results/{task_id}'
     screenshots_dir = f'{result_dir}/screenshots'
     os.makedirs(screenshots_dir, exist_ok=True)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        try:
+            browser = p.chromium.launch(headless=True)
+        except Exception as e:
+            logger.error(f"Failed to launch browser: {e}")
+            return []
         context = browser.new_context(viewport={'width': 1280, 'height': 720})
 
         # Define log_api_request as a closure to capture task_id
