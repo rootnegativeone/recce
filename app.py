@@ -88,8 +88,7 @@ def generate_sitemap_task(url, task_id):
 def capture_screenshots_task(task_id, urls):
     try:
         tasks[task_id]['status'] = 'capturing_screenshots'
-        screenshot_urls = capture_screenshots(task_id, urls)
-        tasks[task_id]['screenshot_urls'] = screenshot_urls
+        capture_screenshots(task_id, urls)
         tasks[task_id]['status'] = 'complete'
     except Exception as e:
         logger.error(f"Error in capture_screenshots_task: {e}")
@@ -160,14 +159,10 @@ def build_sitemap_tree(urls):
 
 def capture_screenshots(task_id, urls):
     processed_urls = set()
-    screenshot_urls = []
+    tasks[task_id]['screenshot_urls'] = []
     tasks[task_id]['api_calls'] = []
     
     # Create directories if they don't exist
-    result_dir = f'static/results/{task_id}'
-    screenshots_dir = f'{result_dir}/screenshots'
-    os.makedirs(screenshots_dir, exist_ok=True)
-
     result_dir = f'static/results/{task_id}'
     screenshots_dir = f'{result_dir}/screenshots'
     os.makedirs(screenshots_dir, exist_ok=True)
@@ -220,9 +215,8 @@ def capture_screenshots(task_id, urls):
                 upload_file_to_s3(screenshot_path, 'recce-results', object_name)
                 screenshot_url = generate_presigned_url('recce-results', object_name, expiration=86400)
 
-                # Update screenshot URLs in tasks
-                screenshot_urls.append({'url': screenshot_url, 'filename': screenshot_filename})
-                tasks[task_id]['screenshot_urls'] = screenshot_urls
+                # Append to the cumulative list
+                tasks[task_id]['screenshot_urls'].append({'url': screenshot_url, 'filename': screenshot_filename})
                 logger.info(f"Captured screenshot for {url}")
             except Exception as e:
                 logger.warning(f"Failed to capture screenshot for {url}: {e}")
@@ -230,8 +224,6 @@ def capture_screenshots(task_id, urls):
         page.close()
         context.close()
         browser.close()
-
-    return screenshot_urls
 
 @app.route('/task_status')
 def task_status():

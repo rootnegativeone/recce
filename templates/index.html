@@ -76,15 +76,8 @@
 		<!-- BOTTOM PANEL: Screenshots -->
                <div class="screenshot-panel" id="screenshot-panel">
                     <h3>SCREENSHOTS</h3>
-                    <div class="screenshot-grid" id="screenshots-content">
-                        <!-- Initial content or placeholders -->
-                            {% for i in range(4) %}
-                                <div class="screenshot-item placeholder">
-                                    <div class="placeholder-content">
-                                        <span> Preview will appear here</span>
-                                    </div>
-                                </div>
-                            {% endfor %}
+                    <div class="screenshot-grid" id="screenshots-content" hx-get="/screenshots_content" hx-trigger="load, every 5s" hx-swap="innerHTML">
+                        <!-- Existing screenshots will be managed by htmx -->
                     </div>
                 </div>
 	    </div>
