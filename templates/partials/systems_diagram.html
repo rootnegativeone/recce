@@ -1,0 +1,7 @@
+<div class="panel-content" id="systems-diagram-content">
+    {% if diagram_svg %}
+        {{ diagram_svg|safe }}
+    {% else %}
+        <pre>No systems diagram available.</pre>
+    {% endif %}
+</div>

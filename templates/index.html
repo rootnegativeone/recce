@@ -12,7 +12,7 @@
 <body>
     <!-- HEADER -->
     <header class="header">
-        <div class="logo">RECCE | SITE ANALYSIS</div>
+        <div class="logo">RECCE | SYSTEMS ANALYSIS</div>
         <div class="status">
             <svg width="10" height="10">
                 <circle cx="5" cy="5" r="5" fill="#28a745"></circle>
@@ -29,19 +29,34 @@
     <div class="control-row">
         <!-- URL INPUT AREA -->
         <section class="input-section">
-            <h3>ENTER URL</h3>
-            <form action="/" method="post">
+            <h3>SITE AND SYSTEMS ANALYSIS</h3>
+            <form action="/" method="post" id="url-form">
                 <input type="url" name="url" placeholder="https://example.com" required>
-                <button type="submit" class="btn-generate">GENERATE</button>
+                <button type="submit" class="btn-generate" id="url-btn">ANALYZE SITE</button>
             </form>
+            <form action="/" method="post" id="systems-form">
+                <input type="text" name="concept1" placeholder="First system concept" required>
+                <input type="text" name="concept2" placeholder="Second system concept" required>
+                <button type="submit" class="btn-generate" id="systems-btn">ANALYZE SYSTEM</button>
+            </form>
+            <script>
+                document.getElementById('analyze-form').addEventListener('submit', function() {
+                    document.getElementById('generate-btn').classList.add('loading');
+                });
+            </script>
+            <script>
+                document.getElementById('analyze-form').addEventListener('submit', function() {
+                    document.getElementById('generate-btn').classList.add('loading');
+                });
+            </script>
         </section>
 
         <!-- ADMIN SECTION -->
         <section class="admin-section">
             <h3>Admin</h3>
             <div class="admin-controls">
-                <button class="btn-admin" disabled>Subscription</button>
-                <button class="btn-admin" disabled>Account</button>
+                <button class="btn-admin" id="subscription-btn">Subscription</button>
+                <button class="btn-admin" id="account-btn">Account</button>
             </div>
         </section>
     </div>
@@ -49,33 +64,49 @@
     <!-- RESULT PANELS -->
 	<section class="results-section">
 	    <div class="results-container">
-		<!-- TOP PANELS: Sitemap and API Analysis -->
+		<!-- Analysis Panels -->
 		<div class="top-panels">
-		    <div class="sitemap-panel" id="sitemap-panel">
-			<h3>SITEMAP</h3>
-                        <div class="sitemap-box" id="sitemap-content">
-                            {% if sitemap_tree %}
-                                <pre>{{ sitemap_tree|join('\n')|safe }}</pre>
-                            {% else %}
-                                <pre>Enter a URL above to analyze sitemap...</pre>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="api-panel">
-			<h3>API CALLS</h3>
-			<div class="api-box">
-			    {% for call in session.get('api_calls', []) %}
-				<pre>{{ call.method }} {{ call.url }}</pre>
-			    {% else %}
-				<pre>Enter a URL above to analyze APIs...</pre>
-			    {% endfor %}
-			</div>
-		    </div>
-		</div>
+		    <div class="sitemap-panel panel-container" id="sitemap-panel">
+                        <div class="panel-header">
+                            <span class="panel-label">Analysis</span>
+                                <h3>SITEMAP</h3>
+                       </div>
+                <div class="panel-content" id="sitemap-content">
+                    {% if sitemap_tree %}
+                        <pre>{{ sitemap_tree|join('\n')|safe }}</pre>
+                    {% else %}
+                <pre>No sitemap available.</pre>
+                   {% endif %}
+                </div>
+            </div>
 
-		<!-- BOTTOM PANEL: Screenshots -->
-               <div class="screenshot-panel" id="screenshot-panel">
-                    <h3>SCREENSHOTS</h3>
+            <div class="api-panel panel-container">
+                <div class="panel-header">
+                    <span class="panel-label">Network</span>
+                    <h3>API CALLS</h3>
+                </div>
+                <div class="panel-content" hx-get="/api_calls_content" hx-trigger="load, every 5s" hx-swap="innerHTML">
+                    <pre>No API calls available.</pre>
+                </div>
+            </div>
+
+            <div class="systems-panel panel-container">
+                <div class="panel-header">
+                    <span class="panel-label">Systems</span>
+                    <h3>SYSTEM DIAGRAM</h3>
+                </div>
+                <div id="systems-diagram-content" hx-get="/systems_diagram" hx-trigger="load">
+                    <pre>Loading system diagram...</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screenshots Panel -->
+        <div class="screenshot-panel" id="screenshot-panel">
+                    <div class="panel-header">
+                        <span class="panel-label">Visual</span>
+                        <h3>SCREENSHOTS</h3>
+                    </div>
                     <div class="screenshot-grid" id="screenshots-content" hx-get="/screenshots_content" hx-trigger="load, every 5s" hx-swap="innerHTML">
                         <!-- Existing screenshots will be managed by htmx -->
                     </div>
@@ -86,7 +117,91 @@
     <!-- FOOTER -->
     <footer>
         <p>&copy; {{ current_year }} Outis Enterprises Incorporated. All rights reserved.</p>
+        <div class="legal-info">
+            <p>Contact: support@recce.ai</p>
+            <p>Subscription Cancellation: Cancel anytime through your account settings or by contacting support.</p>
+            <p>Refund Policy: Full refund available within 14 days of subscription start.</p>
+        </div>
     </footer>
+
+    <!-- Modals -->
+    <div id="subscription-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Subscribe to Recce</h2>
+            <div id="stripe-button-container">
+                <button type="button" class="btn-generate" onclick="startCheckout()">Subscribe Now</button>
+            </div>
+            <script src="https://js.stripe.com/v3/"></script>
+            <script>
+                async function startCheckout() {
+                    try {
+                        const response = await fetch('/create-checkout-session', {
+                            method: 'POST',
+                        });
+                        const { sessionId } = await response.json();
+                        const stripe = Stripe('{{ stripe_public_key }}');
+                        stripe.redirectToCheckout({ sessionId });
+                    } catch (err) {
+                        console.error("Error:", err);
+                    }
+                }
+            </script>
+        </div>
+    </div>
+
+    <div id="account-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Account</h2>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Sign In</button>
+                <div id="login-error" style="color: red; display: none;"></div>
+            </form>
+            <script>
+                async function handleLogin(e) {
+                    e.preventDefault();
+                    const form = e.target;
+                    try {
+                        const response = await fetch('/login', {
+                            method: 'POST',
+                            body: new FormData(form)
+                        });
+                        const data = await response.json();
+                        if (data.status === 'success') {
+                            location.reload();
+                        } else {
+                            document.getElementById('login-error').textContent = data.error;
+                            document.getElementById('login-error').style.display = 'block';
+                        }
+                    } catch (err) {
+                        console.error("Login error:", err);
+                    }
+                }
+            </script>
+        </div>
+    </div>
+
+    <script>
+        // Modal handling
+        const modals = {
+            'subscription-btn': document.getElementById('subscription-modal'),
+            'account-btn': document.getElementById('account-modal')
+        };
+
+        // Button click handlers
+        document.getElementById('subscription-btn').onclick = () => modals['subscription-btn'].style.display = 'block';
+        document.getElementById('account-btn').onclick = () => modals['account-btn'].style.display = 'block';
+
+        // Close button handlers
+        document.querySelectorAll('.close').forEach(btn => {
+            btn.onclick = function() {
+                this.closest('.modal').style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
 

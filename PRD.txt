@@ -1,0 +1,217 @@
+# **Product Requirements Document (PRD) for Recce v0.0.4**
+
+---
+
+## **Product Overview**
+
+**Recce** is a simple, automated tool that provides visual and data-driven insights into cyberphysical systems (websites, plants, societies, solar systems, etc.), tailored for non-technical users like business teams, marketers, content managers, auditors, and product managers. Version 0.0.4 aims to enhance user experience, introduce new functionalities, and refine existing features to align with the core vision of efficiency, usability, and shareability.
+
+---
+
+## **Objectives and Goals**
+
+- **Enhance User Experience**: Improve the usability of the input fields and the overall interface to make it more intuitive and user-friendly.
+- **Implement Systems Diagram Visualization**: Introduce a new feature that generates systems diagrams based on user input, leveraging LLM-driven interpretations.
+- **Refine Existing Features**: Address limitations and bugs in the current version, such as duplicate screenshots and UI layout issues.
+- **Maintain Real-time Streaming**: Ensure that data streaming remains efficient and responsive.
+- **Prepare for Future Monetization**: Lay the groundwork for subscription models by refining account management features.
+
+---
+
+## **Key Features and Requirements**
+
+### **1. Improved URL Input Handling**
+
+- **Accept Flexible URL Formats**:
+  - Users can input URLs without the `https://` prefix (e.g., `domain.com`).
+  - Implement input validation to automatically correct or prompt users for incomplete URLs.
+- **User-Friendly Error Messages**:
+  - Provide clear feedback if the URL is invalid or unreachable prior to committing.
+
+### **2. Systems Diagram Visualization**
+
+- **New Input Fields**:
+  - Add two separate text fields in the URL input section for users to enter short phrases or concepts that will become the basis for the systems diagram.
+- **LLM Integration**:
+  - Utilize ChatGPT's API to interpret the relationship between the two inputs to produce a sketch of the system of interest (SoI)..
+- **Visualization Generation**:
+  - Use Graphviz or a similar tool to create a systems diagram based on the LLM's interpretation, inferring a system boundary from the two inputs.
+- **Output Display**:
+  - Present the systems diagram in a new section below the existing outputs.
+  - Ensure the diagram is interactive, allowing users to zoom in/out and explore components. This is a nice to have.
+
+### **3. Enhanced Screenshot Functionality**
+
+- **Eliminate Duplicate Screenshots**:
+  - Implement checks to avoid capturing and displaying duplicate screenshots.
+  - Ensure that each screenshot corresponds to a unique URL or page.
+- **Descriptive Filenames**:
+  - Save screenshots with filenames that reflect the actual page titles or URLs for easier identification.
+  
+### **4. API Calls Analysis**
+
+- **Network Request Logging**:
+  - Capture API calls made by the website during crawling using Puppeteer or a similar tool.
+- **Analysis Visualization**:
+  - Present a simple text-based visualization or list of detected API endpoints.
+  - Include details such as endpoint URLs, request methods, and response statuses. 
+  - It must be simple, truncating to only the first portion and last portion of the URLs, which tend to be very long. The point is to show only the salient information.
+
+### **5. UI and Design Improvements**
+
+- **Responsive Layout**:
+  - Adjust the UI boxes to dynamically respond to content size.
+  - Implement a flexible grid layout that rearranges components neatly across different screen sizes.
+- **Titles and Labels**:
+  - Remove unnecessary boxes around titles.
+  - Use underlined text or headers to differentiate sections.
+- **Visual Feedback on Generation**:
+  - Add a subtle loading indicator or progress bar when users click "Generate."
+  - Ensure the indicator is non-intrusive but visible enough to inform users of ongoing processes.
+
+### **6. Controls for Sitemap Levels**
+
+- **Adjustable Depth Control**:
+  - Add a control in the input section allowing users to set the depth of the sitemap crawl (default is 10 levels).
+- **Access Restrictions**:
+  - Restrict the ability to increase depth beyond a certain limit for non-subscribed users.
+  - Display a prompt or message encouraging users to subscribe for deeper crawls.
+
+### **7. Account Management and Subscription Preparations**
+
+- **Account Button Implementation**:
+  - Design and implement an account management section where users can create and manage their profile. This control should be by the URL input field and button.
+- **Subscription Integration (Placeholder)**:
+  - Integrate with Stripe for future subscription handling (pending completion of required policies and documentation).
+- **Privacy Policy and Terms of Service**:
+  - Prepare and include necessary legal documents to comply with Stripe's requirements.
+
+### **8. Maintain Real-time Streaming**
+
+- **Efficient Data Streaming**:
+  - Ensure that sitemaps and screenshots stream in real-time as they become available.
+- **Performance Optimization**:
+  - Optimize backend processes to prevent latency or delays in data streaming.
+  - Perhaps consider threading to make sure the streaming continues to work well (i.e. maybe Celery or some serverless functions?).
+---
+
+## **Technical Requirements**
+
+### **Backend**
+
+- **Technology Stack**:
+  - Continue using AWS services for deployment and scalability.
+  - Use Puppeteer for web crawling and network request logging.
+  - Implement asynchronous processing with tools that are simple, cost-effective, and easy to maintain (e.g., AWS Lambda functions).
+- **LLM API Integration**:
+  - Integrate with OpenAI's ChatGPT API for interpreting systems diagrams.
+  - Ensure secure and efficient API calls with proper error handling.
+
+### **Frontend**
+
+- **Responsive Design**:
+  - Utilize CSS frameworks or libraries that support responsive design (e.g., Flexbox, Grid Layout). I want to stick with HTMX -- keep things really simple.
+- **Interactive Elements**:
+  - Implement Graphviz or a similar library for rendering interactive systems diagrams.
+
+### **Security and Compliance**
+
+- **Data Privacy**:
+  - Ensure compliance with data protection regulations when handling user inputs and account data.
+- **API Security**:
+  - Secure API calls and data transmissions with encryption (HTTPS).
+- **User Authentication**:
+  - Implement basic authentication mechanisms for account management (e.g., email and password, OAuth).
+
+---
+
+## **Design and UX Principles**
+
+- **Clean and Utilitarian Aesthetic**:
+  - Maintain the "spaceship dashboard" theme with a focus on functionality and efficiency.
+- **Intuitive Navigation**:
+  - Organize controls and outputs logically for easy navigation.
+- **Minimalist Feedback Mechanisms**:
+  - Use subtle animations or indicators to communicate system states without overwhelming the user.
+
+---
+
+- **User Engagement**:
+  - Monitor the number of users utilizing the new systems diagram feature.
+  - Track usage patterns to understand feature adoption.
+- **Performance Metrics**:
+  - Measure the average time for data streaming to start after clicking "Generate."
+  - Monitor system responsiveness and load times.
+- **Feedback Collection**:
+  - Gather user feedback on the new features and overall usability improvements.
+  - Use feedback to identify areas for further enhancement.
+
+---
+
+## **Risks and Mitigation**
+
+- **Integration Challenges with LLM API**:
+  - *Risk*: Potential difficulties in integrating with ChatGPT's API.
+  - *Mitigation*: Allocate extra time for integration testing; consult documentation and support resources.
+- **Performance Issues with Real-time Streaming**:
+  - *Risk*: New features may impact data streaming performance.
+  - *Mitigation*: Optimize code and use efficient algorithms; perform load testing.
+- **User Confusion with New Features**:
+  - *Risk*: Users may find the new systems diagram feature confusing.
+  - *Mitigation*: Provide tooltips, examples, or a brief tutorial within the UI.
+
+---
+
+## **Assumptions**
+
+- Users have a basic understanding of how to input URLs and interpret visual data outputs.
+- The ChatGPT API will remain accessible and within budget constraints.
+- AWS services will continue to meet the application's scalability and performance needs.
+
+---
+
+## **Out of Scope**
+
+- **Subscription Payment Processing**:
+  - Actual implementation of subscription payments via Stripe is deferred to a future release.
+- **API Access for Users**:
+  - Providing API access to users (Pro Tier) is not included in v0.0.4.
+- **Advanced Data Extraction Features**:
+  - Features like OCR-based data extraction and AI/ML pattern recognition are postponed to later versions.
+
+---
+
+## **Future Considerations**
+
+- **Monetization Strategies**:
+  - Finalize subscription models and integrate payment processing.
+- **Advanced Features**:
+  - Plan for the inclusion of OCR-based data extraction and AI enhancements.
+- **User Accounts and Profiles**:
+  - Expand account management to include user preferences and history.
+
+---
+
+## **Appendices**
+
+### **A. Visual Mockups**
+
+- In the future, I will provide sketches or wireframes of the new UI layout, input fields, and systems diagram output section.
+
+### **B. API Specifications**
+
+- Detail the API endpoints and parameters used for integrating with ChatGPT and any other external services.
+
+### **C. User Stories**
+
+- **As a user**, I want to input a domain without having to type `https://` so that it's quicker and more intuitive.
+- **As a user**, I want to see a visual indication when the system is processing my request so that I know it's working.
+- **As a user**, I want to generate a systems diagram based on two concepts so that I can visualize their relationship.
+
+---
+
+## **Conclusion**
+
+Recce v0.0.4 is focused on enhancing the user experience, introducing innovative features like systems diagram visualization, and refining existing functionalities. By prioritizing simplicity and clarity, this version aims to solidify Recce's position as a valuable tool for non-technical users seeking quick and insightful website and systems analysis.
+
+---

@@ -1,0 +1,12 @@
+<div class="panel-content">
+    {% if api_calls %}
+        {% for call in api_calls %}
+            {% set url_parts = call.url.split('?') %}
+            {% set base_url = url_parts[0] %}
+            {% set query = url_parts[1] if url_parts|length > 1 else '' %}
+            <pre>{{ call.method }} {{ base_url[:50] }}...{% if query %}?...{% endif %}</pre>
+        {% endfor %}
+    {% else %}
+        <pre>No API calls available.</pre>
+    {% endif %}
+</div>
